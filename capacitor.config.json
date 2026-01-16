@@ -1,0 +1,15 @@
+{
+  "appId": "com.hilmi.alquran",
+  "appName": "Al-Quran Digital",
+  "webDir": "www",
+  "server": {
+    "androidScheme": "https"
+  },
+  "plugins": {
+    "SplashScreen": {
+      "launchShowDuration": 2000,
+      "backgroundColor": "#000000",
+      "showSpinner": false
+    }
+  }
+}

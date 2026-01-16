@@ -1,0 +1,1212 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="theme-color" content="#000000">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Al-Quran Digital">
+    <meta name="description" content="Aplikasi Al-Quran Digital dengan fitur lengkap untuk membaca Al-Quran dengan mudah">
+    <title>Al-Quran Digital</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Cairo:wght@400;600;700&family=Lateef:wght@400;700&family=Noto+Naskh+Arabic:wght@400;700&family=Scheherazade+New:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Particle Background -->
+    <canvas id="particles"></canvas>
+
+    <!-- Reading Progress Bar -->
+    <div class="reading-progress" id="readingProgress"></div>
+
+    <!-- Scroll to Top Button -->
+    <button class="scroll-to-top" id="scrollToTop" aria-label="Scroll to top">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="18 15 12 9 6 15"></polyline>
+        </svg>
+    </button>
+
+    <!-- Floating Audio Button -->
+    <button class="floating-audio-btn hidden" id="floatingAudioBtn" aria-label="Audio Player">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+            <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+            <path d="M1 8c0 1 1 2 2 2" stroke-width="1.5" opacity="0.6"></path>
+            <path d="M1 12c0 1.5 1.5 2.5 2.5 2.5" stroke-width="1.5" opacity="0.6"></path>
+            <path d="M1 16c0 2 2 3 3 3" stroke-width="1.5" opacity="0.6"></path>
+        </svg>
+        <span class="audio-indicator"></span>
+    </button>
+
+    <!-- Toast Notification Container -->
+    <div id="toastContainer" class="toast-container"></div>
+
+    <!-- Audio Player Modal -->
+    <div id="audioPlayerModal" class="modal hidden">
+        <div class="modal-overlay"></div>
+        <div class="modal-content audio-player-modal">
+            <div class="modal-header">
+                <h2>Audio Player</h2>
+                <button class="modal-close" id="closeAudioModal">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div id="modalAudioPlayerContent">
+                    <!-- Audio player content will be injected here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Auth Pages -->
+    <div id="loginPage" class="auth-page">
+        <div class="auth-container">
+            <h1 class="auth-title">Al-Quran Digital</h1>
+            <p class="auth-subtitle">Baca Al-Quran dengan mudah</p>
+            
+            <form id="loginForm" class="auth-form">
+                <div class="form-group">
+                    <input type="email" id="loginEmail" placeholder="Email" required>
+                </div>
+                <div class="form-group">
+                    <input type="password" id="loginPassword" placeholder="Password" required>
+                </div>
+                <button type="submit" class="btn-primary">Masuk</button>
+            </form>
+            
+            <p class="auth-switch">
+                Belum punya akun? <a href="#" id="showRegister">Daftar</a>
+            </p>
+        </div>
+    </div>
+
+    <div id="registerPage" class="auth-page hidden">
+        <div class="auth-container">
+            <h1 class="auth-title">Daftar Akun</h1>
+            <p class="auth-subtitle">Mulai perjalanan spiritual Anda</p>
+            
+            <form id="registerForm" class="auth-form">
+                <div class="form-group">
+                    <input type="text" id="registerName" placeholder="Nama Lengkap" required>
+                </div>
+                <div class="form-group">
+                    <input type="email" id="registerEmail" placeholder="Email" required>
+                </div>
+                <div class="form-group">
+                    <input type="password" id="registerPassword" placeholder="Password" required>
+                </div>
+                <button type="submit" class="btn-primary">Daftar</button>
+            </form>
+            
+            <p class="auth-switch">
+                Sudah punya akun? <a href="#" id="showLogin">Masuk</a>
+            </p>
+        </div>
+    </div>
+
+    <!-- Main App -->
+    <div id="mainApp" class="hidden">
+        <!-- Header -->
+        <header class="app-header">
+            <div class="container">
+                <h1 class="app-logo">Al-Quran Digital</h1>
+            </div>
+        </header>
+
+        <!-- Islamic Calendar Modal -->
+        <div id="islamicCalendarModal" class="modal hidden">
+            <div class="modal-overlay"></div>
+            <div class="modal-content calendar-modal">
+                <div class="modal-header">
+                    <h2>
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display: inline-block; margin-right: 8px; vertical-align: middle;">
+                            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                            <line x1="16" y1="2" x2="16" y2="6"></line>
+                            <line x1="8" y1="2" x2="8" y2="6"></line>
+                            <line x1="3" y1="10" x2="21" y2="10"></line>
+                            <circle cx="8" cy="14" r="2"></circle>
+                        </svg>
+                        Kalender Islam
+                    </h2>
+                    <button class="modal-close" id="closeIslamicCalendar">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="18" y1="6" x2="6" y2="18"></line>
+                            <line x1="6" y1="6" x2="18" y2="18"></line>
+                        </svg>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <!-- Current Date Display -->
+                    <div class="current-date-card">
+                        <div class="date-display">
+                            <div class="hijri-date" id="hijriDate">Memuat tanggal Hijriah...</div>
+                            <div class="gregorian-date" id="gregorianDate"></div>
+                        </div>
+                    </div>
+
+                    <!-- Ramadan Countdown -->
+                    <div class="ramadan-countdown-card" id="ramadanCountdown">
+                        <div class="countdown-header">
+                            <div class="countdown-icon">🌙</div>
+                            <div class="countdown-title">Ramadan 1446 H</div>
+                        </div>
+                        <div class="countdown-display">
+                            <div class="countdown-item">
+                                <div class="countdown-number" id="ramadanDays">--</div>
+                                <div class="countdown-label">Hari</div>
+                            </div>
+                            <div class="countdown-item">
+                                <div class="countdown-number" id="ramadanHours">--</div>
+                                <div class="countdown-label">Jam</div>
+                            </div>
+                            <div class="countdown-item">
+                                <div class="countdown-number" id="ramadanMinutes">--</div>
+                                <div class="countdown-label">Menit</div>
+                            </div>
+                        </div>
+                        <div class="countdown-message" id="ramadanMessage">Persiapkan diri untuk bulan suci Ramadan</div>
+                    </div>
+
+                    <!-- Islamic Events -->
+                    <div class="islamic-events-section">
+                        <h3 class="section-title">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                                <line x1="16" y1="2" x2="16" y2="6"></line>
+                                <line x1="8" y1="2" x2="8" y2="6"></line>
+                                <line x1="3" y1="10" x2="21" y2="10"></line>
+                                <circle cx="8" cy="14" r="2"></circle>
+                            </svg>
+                            Event Islam Penting
+                        </h3>
+                        <div class="events-list" id="islamicEventsList">
+                            <div class="loading-state">Memuat event...</div>
+                        </div>
+                    </div>
+
+                    <!-- Special Days -->
+                    <div class="special-days-section">
+                        <h3 class="section-title">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+                            </svg>
+                            Hari-Hari Istimewa
+                        </h3>
+                        <div class="special-days-grid">
+                            <div class="special-day-card">
+                                <div class="special-day-icon">
+                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M12 2L2 7v10c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V7l-10-5z"></path>
+                                        <circle cx="12" cy="12" r="3"></circle>
+                                    </svg>
+                                </div>
+                                <div class="special-day-name">Jumat</div>
+                                <div class="special-day-desc">Hari berkumpul umat Islam</div>
+                            </div>
+                            <div class="special-day-card">
+                                <div class="special-day-icon">
+                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                                        <circle cx="12" cy="12" r="2"></circle>
+                                    </svg>
+                                </div>
+                                <div class="special-day-name">Lailatul Qadr</div>
+                                <div class="special-day-desc">Malam seribu bulan</div>
+                            </div>
+                            <div class="special-day-card">
+                                <div class="special-day-icon">
+                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <circle cx="12" cy="12" r="5"></circle>
+                                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                                    </svg>
+                                </div>
+                                <div class="special-day-name">Eid al-Fitr</div>
+                                <div class="special-day-desc">Hari raya Idul Fitri</div>
+                            </div>
+                            <div class="special-day-card">
+                                <div class="special-day-icon">
+                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.29 1.51 4.04 3 5.5l7 7Z"></path>
+                                    </svg>
+                                </div>
+                                <div class="special-day-name">Eid al-Adha</div>
+                                <div class="special-day-desc">Hari raya Idul Adha</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Month Navigation -->
+                    <div class="month-navigation">
+                        <button class="nav-btn" id="prevMonth">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polyline points="15 18 9 12 15 6"></polyline>
+                            </svg>
+                            Bulan Sebelumnya
+                        </button>
+                        <div class="current-month" id="currentHijriMonth">Muharram 1446</div>
+                        <button class="nav-btn" id="nextMonth">
+                            Bulan Berikutnya
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polyline points="9 6 15 12 9 18"></polyline>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Doa & Dzikir Modal -->
+        <div id="doaModal" class="modal hidden">
+            <div class="modal-overlay"></div>
+            <div class="modal-content doa-modal">
+                <div class="modal-header">
+                    <h2>
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display: inline-block; margin-right: 8px; vertical-align: middle;">
+                            <path d="M20 6L9 17l-5-5"></path>
+                            <circle cx="12" cy="12" r="3" fill="currentColor" opacity="0.3"></circle>
+                            <path d="M12 1v6m0 6v6"></path>
+                        </svg>
+                        Doa & Dzikir
+                    </h2>
+                    <button class="modal-close" id="closeDoaModal">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="18" y1="6" x2="6" y2="18"></line>
+                            <line x1="6" y1="6" x2="18" y2="18"></line>
+                        </svg>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <!-- Tabs -->
+                    <div class="doa-tabs">
+                        <button class="doa-tab active" data-tab="doa">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.29 1.51 4.04 3 5.5l7 7Z"></path>
+                            </svg>
+                            Doa Harian
+                        </button>
+                        <button class="doa-tab" data-tab="dzikir">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="12" cy="12" r="10"></circle>
+                                <path d="M12 6v6l4 2"></path>
+                            </svg>
+                            Dzikir Counter
+                        </button>
+                    </div>
+
+                    <!-- Doa Content -->
+                    <div id="doaContent" class="tab-content active">
+                        <div class="doa-categories" id="doaCategories">
+                            <div class="loading-state">Memuat doa...</div>
+                        </div>
+                        <div class="doa-detail hidden" id="doaDetail">
+                            <button class="btn-back" id="backToDoa">← Kembali</button>
+                            <div class="doa-item-detail" id="doaItemDetail"></div>
+                        </div>
+                    </div>
+
+                    <!-- Dzikir Content -->
+                    <div id="dzikirContent" class="tab-content">
+                        <div class="dzikir-counter-container">
+                            <div class="dzikir-selector">
+                                <select id="dzikirSelect" class="dzikir-select">
+                                    <option value="tasbih">Tasbih - سُبْحَانَ اللَّهِ</option>
+                                    <option value="tahmid">Tahmid - الْحَمْدُ لِلَّهِ</option>
+                                    <option value="takbir">Takbir - اللَّهُ أَكْبَرُ</option>
+                                    <option value="tahlil">Tahlil - لَا إِلَهَ إِلَّا اللَّهُ</option>
+                                </select>
+                            </div>
+                            
+                            <div class="dzikir-display">
+                                <div class="dzikir-arabic" id="dzikirArabic">سُبْحَانَ اللَّهِ</div>
+                                <div class="dzikir-latin" id="dzikirLatin">Subhanallah</div>
+                                <div class="dzikir-meaning" id="dzikirMeaning">Maha Suci Allah</div>
+                            </div>
+
+                            <div class="counter-display">
+                                <div class="counter-number" id="counterNumber">0</div>
+                                <div class="counter-target">/ <span id="counterTarget">33</span></div>
+                            </div>
+
+                            <div class="counter-controls">
+                                <button class="counter-btn" id="counterBtn">
+                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M20 6L9 17l-5-5"></path>
+                                    </svg>
+                                    Dzikir
+                                </button>
+                                <button class="counter-reset" id="resetCounter">Reset</button>
+                            </div>
+
+                            <div class="target-selector">
+                                <label>Target:</label>
+                                <div class="target-buttons">
+                                    <button class="target-btn active" data-target="33">33x</button>
+                                    <button class="target-btn" data-target="100">100x</button>
+                                    <button class="target-btn" data-target="1000">1000x</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Prayer Times Modal -->
+        <div id="prayerTimesModal" class="modal hidden">
+            <div class="modal-overlay"></div>
+            <div class="modal-content prayer-modal">
+                <div class="modal-header">
+                    <h2>
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display: inline-block; margin-right: 8px; vertical-align: middle;">
+                            <path d="M12 2L2 7v10c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V7l-10-5z"></path>
+                            <circle cx="12" cy="12" r="3"></circle>
+                        </svg>
+                        Jadwal Sholat
+                    </h2>
+                    <button class="modal-close" id="closePrayerTimes">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="18" y1="6" x2="6" y2="18"></line>
+                            <line x1="6" y1="6" x2="18" y2="18"></line>
+                        </svg>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <!-- Next Prayer Highlight -->
+                    <div class="next-prayer-card">
+                        <div class="next-prayer-label">Sholat Berikutnya</div>
+                        <div class="next-prayer-name" id="modalNextPrayerName">Memuat...</div>
+                        <div class="next-prayer-time" id="modalNextPrayerTime">--:--</div>
+                        <div class="next-prayer-countdown" id="modalNextPrayerCountdown">--:--:--</div>
+                    </div>
+
+                    <!-- All Prayer Times -->
+                    <div class="prayer-times-list">
+                        <div class="prayer-time-item clickable" onclick="showPrayerDetail('fajr')">
+                            <div class="prayer-time-name">
+                                <svg class="prayer-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <circle cx="12" cy="12" r="4"></circle>
+                                    <path d="M12 2v2"></path>
+                                    <path d="M12 20v2"></path>
+                                    <path d="M4.93 4.93l1.41 1.41"></path>
+                                    <path d="M17.66 17.66l1.41 1.41"></path>
+                                    <path d="M2 12h2"></path>
+                                    <path d="M20 12h2"></path>
+                                    <path d="M6.34 17.66l-1.41 1.41"></path>
+                                    <path d="M19.07 4.93l-1.41 1.41"></path>
+                                </svg>
+                                <span>Subuh</span>
+                            </div>
+                            <div class="prayer-time-value" id="fajrTime">--:--</div>
+                        </div>
+                        <div class="prayer-time-item clickable" onclick="showPrayerDetail('dhuhr')">
+                            <div class="prayer-time-name">
+                                <svg class="prayer-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <circle cx="12" cy="12" r="5"></circle>
+                                    <line x1="12" y1="1" x2="12" y2="3"></line>
+                                    <line x1="12" y1="21" x2="12" y2="23"></line>
+                                    <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                                    <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                                    <line x1="1" y1="12" x2="3" y2="12"></line>
+                                    <line x1="21" y1="12" x2="23" y2="12"></line>
+                                    <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                                    <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                                </svg>
+                                <span>Dzuhur</span>
+                            </div>
+                            <div class="prayer-time-value" id="dhuhrTime">--:--</div>
+                        </div>
+                        <div class="prayer-time-item clickable" onclick="showPrayerDetail('asr')">
+                            <div class="prayer-time-name">
+                                <svg class="prayer-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <circle cx="12" cy="12" r="3"></circle>
+                                    <path d="M12 1v6"></path>
+                                    <path d="M12 17v6"></path>
+                                    <path d="M5.64 5.64l4.24 4.24"></path>
+                                    <path d="M14.12 14.12l4.24 4.24"></path>
+                                    <path d="M1 12h6"></path>
+                                    <path d="M17 12h6"></path>
+                                    <path d="M5.64 18.36l4.24-4.24"></path>
+                                    <path d="M14.12 9.88l4.24-4.24"></path>
+                                </svg>
+                                <span>Ashar</span>
+                            </div>
+                            <div class="prayer-time-value" id="asrTime">--:--</div>
+                        </div>
+                        <div class="prayer-time-item clickable" onclick="showPrayerDetail('maghrib')">
+                            <div class="prayer-time-name">
+                                <svg class="prayer-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"></path>
+                                    <path d="M12 2v2"></path>
+                                    <path d="M12 20v2"></path>
+                                    <path d="M4.22 4.22l1.42 1.42"></path>
+                                    <path d="M18.36 18.36l1.42 1.42"></path>
+                                </svg>
+                                <span>Maghrib</span>
+                            </div>
+                            <div class="prayer-time-value" id="maghribTime">--:--</div>
+                        </div>
+                        <div class="prayer-time-item clickable" onclick="showPrayerDetail('isha')">
+                            <div class="prayer-time-name">
+                                <svg class="prayer-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                                </svg>
+                                <span>Isya</span>
+                            </div>
+                            <div class="prayer-time-value" id="ishaTime">--:--</div>
+                        </div>
+                    </div>
+
+                    <!-- Sunnah Prayer Times -->
+                    <div class="sunnah-prayer-section">
+                        <h3 class="section-title">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path>
+                            </svg>
+                            Sholat Sunnah
+                        </h3>
+                        <div class="sunnah-prayer-list">
+                            <div class="sunnah-prayer-item clickable" onclick="showPrayerDetail('tahajud')">
+                                <div class="sunnah-prayer-name">
+                                    <svg class="prayer-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                                        <circle cx="12" cy="12" r="2"></circle>
+                                    </svg>
+                                    <span>Tahajud</span>
+                                </div>
+                                <div class="sunnah-prayer-time" id="tahajudTime">--:--</div>
+                                <div class="sunnah-prayer-desc">Sepertiga malam akhir</div>
+                            </div>
+                            <div class="sunnah-prayer-item clickable" onclick="showPrayerDetail('dhuha')">
+                                <div class="sunnah-prayer-name">
+                                    <svg class="prayer-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <circle cx="12" cy="12" r="5"></circle>
+                                        <path d="M12 1v6"></path>
+                                        <path d="M17 7l-5 5"></path>
+                                    </svg>
+                                    <span>Dhuha</span>
+                                </div>
+                                <div class="sunnah-prayer-time" id="dhuhaTime">--:--</div>
+                                <div class="sunnah-prayer-desc">Pagi hingga menjelang Dzuhur</div>
+                            </div>
+                            <div class="sunnah-prayer-item clickable" onclick="showPrayerDetail('witir')">
+                                <div class="sunnah-prayer-name">
+                                    <svg class="prayer-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                                    </svg>
+                                    <span>Witir</span>
+                                </div>
+                                <div class="sunnah-prayer-time" id="witrTime">--:--</div>
+                                <div class="sunnah-prayer-desc">Setelah Isya hingga Subuh</div>
+                            </div>
+                            <div class="sunnah-prayer-item clickable" onclick="showPrayerDetail('qabliyah-subuh')">
+                                <div class="sunnah-prayer-name">
+                                    <svg class="prayer-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <circle cx="12" cy="12" r="5"></circle>
+                                        <path d="M12 7v10"></path>
+                                    </svg>
+                                    <span>Qabliyah Subuh</span>
+                                </div>
+                                <div class="sunnah-prayer-time" id="qabliyahSubuhTime">--:--</div>
+                                <div class="sunnah-prayer-desc">Sebelum Subuh</div>
+                            </div>
+                            <div class="sunnah-prayer-item clickable" onclick="showPrayerDetail('qabliyah-dzuhur')">
+                                <div class="sunnah-prayer-name">
+                                    <svg class="prayer-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <circle cx="12" cy="12" r="5"></circle>
+                                        <path d="M12 16V8"></path>
+                                    </svg>
+                                    <span>Qabliyah Dzuhur</span>
+                                </div>
+                                <div class="sunnah-prayer-time" id="qabliyahDzuhurTime">--:--</div>
+                                <div class="sunnah-prayer-desc">Sebelum Dzuhur</div>
+                            </div>
+                            <div class="sunnah-prayer-item clickable" onclick="showPrayerDetail('badiyah-dzuhur')">
+                                <div class="sunnah-prayer-name">
+                                    <svg class="prayer-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <circle cx="12" cy="12" r="5"></circle>
+                                        <path d="M8 12l4 4 4-4"></path>
+                                    </svg>
+                                    <span>Ba'diyah Dzuhur</span>
+                                </div>
+                                <div class="sunnah-prayer-time" id="badiyahDzuhurTime">--:--</div>
+                                <div class="sunnah-prayer-desc">Setelah Dzuhur</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="prayer-location" id="prayerLocation">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display: inline-block; margin-right: 6px; vertical-align: middle;">
+                            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                            <circle cx="12" cy="10" r="3"></circle>
+                        </svg>
+                        Memuat lokasi...
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Prayer Detail Modal -->
+        <div id="prayerDetailModal" class="modal hidden">
+            <div class="modal-overlay"></div>
+            <div class="modal-content prayer-detail-modal">
+                <div class="modal-header">
+                    <h2 id="prayerDetailTitle">Detail Sholat</h2>
+                    <button class="modal-close" id="closePrayerDetail">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="18" y1="6" x2="6" y2="18"></line>
+                            <line x1="6" y1="6" x2="18" y2="18"></line>
+                        </svg>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <!-- Prayer Time Info -->
+                    <div class="prayer-detail-header">
+                        <div class="prayer-detail-icon" id="prayerDetailIcon">🕌</div>
+                        <div class="prayer-detail-info">
+                            <div class="prayer-detail-name" id="prayerDetailName">Sholat Subuh</div>
+                            <div class="prayer-detail-time" id="prayerDetailTime">04:45</div>
+                            <div class="prayer-detail-desc" id="prayerDetailDesc">Sholat fardhu di waktu fajar</div>
+                        </div>
+                    </div>
+
+                    <!-- Tabs -->
+                    <div class="prayer-detail-tabs">
+                        <button class="prayer-detail-tab active" data-tab="niat">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M20 6L9 17l-5-5"></path>
+                            </svg>
+                            Niat
+                        </button>
+                        <button class="prayer-detail-tab" data-tab="doa">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.29 1.51 4.04 3 5.5l7 7Z"></path>
+                            </svg>
+                            Doa
+                        </button>
+                        <button class="prayer-detail-tab" data-tab="keutamaan">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+                            </svg>
+                            Keutamaan
+                        </button>
+                        <button class="prayer-detail-tab" data-tab="teguran">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+                                <line x1="12" y1="9" x2="12" y2="13"></line>
+                                <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                            </svg>
+                            Peringatan
+                        </button>
+                    </div>
+
+                    <!-- Tab Contents -->
+                    <div class="prayer-detail-content">
+                        <!-- Niat Tab -->
+                        <div id="niatContent" class="prayer-tab-content active">
+                            <div class="prayer-content-section">
+                                <h3>Niat Sholat</h3>
+                                <div class="prayer-text-arabic" id="niatArabic">نَوَيْتُ أَنْ أُصَلِّيَ فَرْضَ الصُّبْحِ رَكْعَتَيْنِ مُسْتَقْبِلَ الْقِبْلَةِ أَدَاءً لِلَّهِ تَعَالَى</div>
+                                <div class="prayer-text-latin" id="niatLatin">Nawaitu an ushalliya fardha ash-shubhi rak'ataini mustaqbilal qiblati adaa-an lillaahi ta'aala</div>
+                                <div class="prayer-text-meaning" id="niatMeaning">Aku berniat mengerjakan sholat fardhu Subuh dua rakaat menghadap kiblat karena Allah Ta'ala</div>
+                            </div>
+                        </div>
+
+                        <!-- Doa Tab -->
+                        <div id="doaContent" class="prayer-tab-content">
+                            <div class="prayer-content-section">
+                                <h3>Doa Sebelum Sholat</h3>
+                                <div class="prayer-text-arabic">اللَّهُمَّ بَاعِدْ بَيْنِي وَبَيْنَ خَطَايَايَ كَمَا بَاعَدْتَ بَيْنَ الْمَشْرِقِ وَالْمَغْرِبِ</div>
+                                <div class="prayer-text-latin">Allahumma baa'id baini wa baina khathaayaaya kamaa baa'adta bainal masyriqil wa maghrib</div>
+                                <div class="prayer-text-meaning">Ya Allah, jauhkanlah antara aku dan dosa-dosaku sebagaimana Engkau jauhkan antara timur dan barat</div>
+                            </div>
+                            <div class="prayer-content-section">
+                                <h3>Doa Setelah Sholat</h3>
+                                <div class="prayer-text-arabic" id="doaSetelahArabic">أَسْتَغْفِرُ اللَّهَ الْعَظِيمَ الَّذِي لَا إِلَهَ إِلَّا هُوَ الْحَيُّ الْقَيُّومُ وَأَتُوبُ إِلَيْهِ</div>
+                                <div class="prayer-text-latin" id="doaSetelahLatin">Astaghfirullaahal 'azhiimal ladzii laa ilaaha illaa huwal hayyul qayyuumu wa atuubu ilaih</div>
+                                <div class="prayer-text-meaning" id="doaSetelahMeaning">Aku memohon ampun kepada Allah Yang Maha Agung, yang tiada Tuhan selain Dia, Yang Maha Hidup lagi Maha Berdiri Sendiri, dan aku bertaubat kepada-Nya</div>
+                            </div>
+                        </div>
+
+                        <!-- Keutamaan Tab -->
+                        <div id="keutamaanContent" class="prayer-tab-content">
+                            <div class="prayer-content-section">
+                                <h3>Keutamaan Sholat</h3>
+                                <div class="keutamaan-list" id="keutamaanList">
+                                    <div class="keutamaan-item">
+                                        <div class="keutamaan-icon">⭐</div>
+                                        <div class="keutamaan-text">Sholat Subuh berjamaah seperti sholat sepanjang malam</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Teguran Tab -->
+                        <div id="teguranContent" class="prayer-tab-content">
+                            <div class="prayer-content-section">
+                                <h3>Peringatan Meninggalkan Sholat</h3>
+                                <div class="teguran-list" id="teguranList">
+                                    <div class="teguran-item">
+                                        <div class="teguran-icon">⚠️</div>
+                                        <div class="teguran-text">Barangsiapa yang meninggalkan sholat Subuh, maka cahaya wajahnya akan hilang</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="prayer-detail-actions">
+                        <button class="btn-copy-prayer" id="copyPrayerDetail">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                            </svg>
+                            Copy Detail
+                        </button>
+                        <button class="btn-share-prayer" id="sharePrayerDetail">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="18" cy="5" r="3"></circle>
+                                <circle cx="6" cy="12" r="3"></circle>
+                                <circle cx="18" cy="19" r="3"></circle>
+                                <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line>
+                                <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line>
+                            </svg>
+                            Share
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Profile Modal -->
+        <div id="profileModal" class="modal hidden">
+            <div class="modal-overlay"></div>
+            <div class="modal-content profile-modal">
+                <div class="modal-header">
+                    <h2>Profil Saya</h2>
+                    <button class="modal-close" id="closeProfile">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="18" y1="6" x2="6" y2="18"></line>
+                            <line x1="6" y1="6" x2="18" y2="18"></line>
+                        </svg>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <!-- Profile Header -->
+                    <div class="profile-header">
+                        <div class="profile-avatar-section">
+                            <div class="profile-avatar-large" id="profileAvatarLarge">👤</div>
+                            <button class="btn-change-avatar" id="changeAvatarBtn">Ganti Avatar</button>
+                        </div>
+                        <div class="profile-info-section">
+                            <div class="profile-name-edit">
+                                <input type="text" id="profileNameInput" class="profile-name-input" placeholder="Nama Anda">
+                                <button class="btn-save-name" id="saveNameBtn">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <polyline points="20 6 9 17 4 12"></polyline>
+                                    </svg>
+                                </button>
+                            </div>
+                            <div class="profile-email" id="profileEmail"></div>
+                            <div class="profile-joined" id="profileJoined"></div>
+                        </div>
+                    </div>
+
+                    <!-- Avatar Selector -->
+                    <div class="avatar-selector hidden" id="avatarSelector">
+                        <h3>Pilih Avatar</h3>
+                        <div class="avatar-grid">
+                            <div class="avatar-option" data-avatar="👤">👤</div>
+                            <div class="avatar-option" data-avatar="👨">👨</div>
+                            <div class="avatar-option" data-avatar="👩">👩</div>
+                            <div class="avatar-option" data-avatar="🧔">🧔</div>
+                            <div class="avatar-option" data-avatar="👳">👳</div>
+                            <div class="avatar-option" data-avatar="🧕">🧕</div>
+                        </div>
+                    </div>
+
+                    <!-- Statistics -->
+                    <div class="profile-section">
+                        <h3 class="section-title">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <line x1="18" y1="20" x2="18" y2="10"></line>
+                                <line x1="12" y1="20" x2="12" y2="4"></line>
+                                <line x1="6" y1="20" x2="6" y2="14"></line>
+                            </svg>
+                            Statistik Bacaan
+                        </h3>
+                        <div class="stats-grid">
+                            <div class="stat-card">
+                                <div class="stat-value" id="statSurahsRead">0</div>
+                                <div class="stat-label">Surah Dibaca</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-value" id="statBookmarks">0</div>
+                                <div class="stat-label">Bookmark</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-value" id="statStreak">0 🔥</div>
+                                <div class="stat-label">Hari Berturut</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-value" id="statProgress">0%</div>
+                                <div class="stat-label">Progress Khatam</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Achievements -->
+                    <div class="profile-section">
+                        <h3 class="section-title">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"></path>
+                                <path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"></path>
+                                <path d="M4 22h16l-1-7H5z"></path>
+                                <path d="M8 9v13"></path>
+                                <path d="M16 9v13"></path>
+                            </svg>
+                            Pencapaian
+                        </h3>
+                        <div class="achievements-grid">
+                            <div class="achievement-badge" data-achievement="first-read">
+                                <div class="badge-icon">📖</div>
+                                <div class="badge-name">Pembaca Pertama</div>
+                                <div class="badge-desc">Baca surah pertama</div>
+                            </div>
+                            <div class="achievement-badge" data-achievement="10-surah">
+                                <div class="badge-icon">📚</div>
+                                <div class="badge-name">Rajin Membaca</div>
+                                <div class="badge-desc">Baca 10 surah</div>
+                            </div>
+                            <div class="achievement-badge" data-achievement="bookmark-5">
+                                <div class="badge-icon">⭐</div>
+                                <div class="badge-name">Kolektor</div>
+                                <div class="badge-desc">5 bookmark</div>
+                            </div>
+                            <div class="achievement-badge" data-achievement="streak-7">
+                                <div class="badge-icon">🔥</div>
+                                <div class="badge-name">Konsisten</div>
+                                <div class="badge-desc">7 hari berturut</div>
+                            </div>
+                            <div class="achievement-badge" data-achievement="khatam">
+                                <div class="badge-icon">🎉</div>
+                                <div class="badge-name">Khatam</div>
+                                <div class="badge-desc">Selesai 114 surah</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Quick Settings -->
+                    <div class="profile-section">
+                        <h3 class="section-title">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="12" cy="12" r="3"></circle>
+                                <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1 1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+                            </svg>
+                            Pengaturan Cepat
+                        </h3>
+                        <div class="quick-settings">
+                            <div class="quick-setting-item">
+                                <span>Qari Favorit</span>
+                                <span class="setting-value" id="quickQari">Mishary Alafasy</span>
+                            </div>
+                            <div class="quick-setting-item">
+                                <span>Theme</span>
+                                <span class="setting-value" id="quickTheme">Light</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Notification Settings Modal -->
+        <div id="notificationModal" class="modal hidden">
+            <div class="modal-overlay"></div>
+            <div class="modal-content notification-modal">
+                <div class="modal-header">
+                    <h2>
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display: inline-block; margin-right: 8px; vertical-align: middle;">
+                            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                            <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+                        </svg>
+                        Notifikasi Sholat
+                    </h2>
+                    <button class="modal-close" id="closeNotificationModal">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="18" y1="6" x2="6" y2="18"></line>
+                            <line x1="6" y1="6" x2="18" y2="18"></line>
+                        </svg>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <!-- Enable Notifications -->
+                    <div class="setting-group">
+                        <label class="setting-toggle">
+                            <span>Aktifkan Notifikasi Sholat</span>
+                            <div class="toggle-switch">
+                                <input type="checkbox" id="enableNotifications" checked>
+                                <span class="toggle-slider-switch"></span>
+                            </div>
+                        </label>
+                    </div>
+
+                    <!-- Reminder Before -->
+                    <div class="setting-group">
+                        <label class="setting-label">
+                            <span>Pengingat Sebelum Waktu Sholat</span>
+                        </label>
+                        <select id="reminderMinutes" class="setting-select">
+                            <option value="0">Tidak ada</option>
+                            <option value="5" selected>5 menit sebelum</option>
+                            <option value="10">10 menit sebelum</option>
+                            <option value="15">15 menit sebelum</option>
+                        </select>
+                    </div>
+
+                    <!-- Prayer Toggles -->
+                    <div class="setting-group">
+                        <h3 class="section-title">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="12" cy="12" r="10"></circle>
+                                <polyline points="12 6 12 12 16 14"></polyline>
+                            </svg>
+                            Waktu Sholat
+                        </h3>
+                        <div class="prayer-toggles">
+                            <label class="setting-toggle">
+                                <span>Subuh</span>
+                                <div class="toggle-switch">
+                                    <input type="checkbox" class="prayer-toggle" data-prayer="fajr" checked>
+                                    <span class="toggle-slider-switch"></span>
+                                </div>
+                            </label>
+                            <label class="setting-toggle">
+                                <span>Dzuhur</span>
+                                <div class="toggle-switch">
+                                    <input type="checkbox" class="prayer-toggle" data-prayer="dhuhr" checked>
+                                    <span class="toggle-slider-switch"></span>
+                                </div>
+                            </label>
+                            <label class="setting-toggle">
+                                <span>Ashar</span>
+                                <div class="toggle-switch">
+                                    <input type="checkbox" class="prayer-toggle" data-prayer="asr" checked>
+                                    <span class="toggle-slider-switch"></span>
+                                </div>
+                            </label>
+                            <label class="setting-toggle">
+                                <span>Maghrib</span>
+                                <div class="toggle-switch">
+                                    <input type="checkbox" class="prayer-toggle" data-prayer="maghrib" checked>
+                                    <span class="toggle-slider-switch"></span>
+                                </div>
+                            </label>
+                            <label class="setting-toggle">
+                                <span>Isya</span>
+                                <div class="toggle-switch">
+                                    <input type="checkbox" class="prayer-toggle" data-prayer="isha" checked>
+                                    <span class="toggle-slider-switch"></span>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Adhan Sound -->
+                    <div class="setting-group">
+                        <label class="setting-label">
+                            <span>Suara Adzan</span>
+                        </label>
+                        <select id="adhanSound" class="setting-select">
+                            <option value="makkah" selected>🕋 Adzan Makkah</option>
+                            <option value="madinah">🕌 Adzan Madinah</option>
+                            <option value="egypt">🇪🇬 Adzan Mesir</option>
+                            <option value="turkey">🇹🇷 Adzan Turki</option>
+                            <option value="silent">🔇 Silent (tanpa suara)</option>
+                        </select>
+                    </div>
+
+                    <!-- Volume -->
+                    <div class="setting-group">
+                        <label class="setting-label">
+                            <span>Volume Adzan</span>
+                            <span class="setting-value" id="volumeValue">80%</span>
+                        </label>
+                        <input type="range" id="volumeSlider" min="0" max="100" step="5" value="80" class="slider">
+                        <div class="slider-labels">
+                            <span>0%</span>
+                            <span>50%</span>
+                            <span>100%</span>
+                        </div>
+                    </div>
+
+                    <!-- Vibration -->
+                    <div class="setting-group">
+                        <label class="setting-toggle">
+                            <span>Getar (Vibration)</span>
+                            <div class="toggle-switch">
+                                <input type="checkbox" id="vibrationToggle" checked>
+                                <span class="toggle-slider-switch"></span>
+                            </div>
+                        </label>
+                    </div>
+
+                    <!-- Test Buttons -->
+                    <div class="setting-group">
+                        <h3 class="section-title">Test</h3>
+                        <div class="test-buttons">
+                            <button class="btn-test" id="testNotification">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                                    <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+                                </svg>
+                                Test Notifikasi
+                            </button>
+                            <button class="btn-test" id="testAdhan">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+                                    <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+                                </svg>
+                                Test Suara Adzan
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Save Button -->
+                    <button class="btn-primary" id="saveNotificationSettings">Simpan Pengaturan</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="container">
+                <!-- Search -->
+                <div class="search-section">
+                    <input type="text" id="searchSurah" placeholder="Cari surah..." class="search-input">
+                </div>
+
+                <!-- Surah List -->
+                <div id="surahList" class="surah-grid"></div>
+
+                <!-- Surah Detail -->
+                <div id="surahDetail" class="surah-detail hidden">
+                    <button id="backBtn" class="btn-back">← Kembali</button>
+                    <div id="surahContent"></div>
+                </div>
+
+                <!-- Bookmarks View -->
+                <div id="bookmarksView" class="bookmarks-view hidden">
+                    <h2 class="page-title">Bookmark & Riwayat</h2>
+                    <div id="bookmarksContainer"></div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Dock Navigation -->
+        <nav class="dock">
+            <button class="dock-item active" data-view="list" title="Daftar Surah">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                    <!-- Quran on Rehal (Stand) -->
+                    <path d="M12 2L4 6v3l8 4 8-4V6l-8-4z" opacity="0.3"/>
+                    <path d="M4 9v6c0 1 1 2 2 2h5V9L4 9z"/>
+                    <path d="M13 17h5c1 0 2-1 2-2V9l-7 0v8z"/>
+                    <path d="M12 9v8"/>
+                    <path d="M4 17l3 3h10l3-3"/>
+                </svg>
+            </button>
+            <button class="dock-item" data-view="bookmarks" title="Bookmark">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path>
+                </svg>
+            </button>
+            <button class="dock-item" id="dockPrayerToggle" title="Jadwal Sholat">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <polyline points="12 6 12 12 16 14"></polyline>
+                </svg>
+            </button>
+            <button class="dock-item" id="dockDoaToggle" title="Doa & Dzikir">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M12 2a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"></path>
+                    <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
+                    <line x1="12" y1="19" x2="12" y2="23"></line>
+                    <line x1="8" y1="23" x2="16" y2="23"></line>
+                </svg>
+            </button>
+            <button class="dock-item" id="dockCalendarToggle" title="Kalender Islam">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                    <line x1="16" y1="2" x2="16" y2="6"></line>
+                    <line x1="8" y1="2" x2="8" y2="6"></line>
+                    <line x1="3" y1="10" x2="21" y2="10"></line>
+                </svg>
+            </button>
+            <button class="dock-item" id="dockProfileToggle" title="Profil Saya">
+                <div class="dock-profile-avatar" id="dockUserAvatar">👤</div>
+            </button>
+            <button class="dock-item" id="dockThemeToggle" title="Ubah Mode Baca">
+                <div class="theme-toggle-container">
+                    <svg class="theme-icon sun-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                    <svg class="theme-icon moon-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                </div>
+            </button>
+        </nav>
+
+        <!-- Font Settings Modal -->
+        <div id="fontSettingsModal" class="modal hidden">
+            <div class="modal-overlay"></div>
+            <div class="modal-content font-settings-modal">
+                <div class="modal-header">
+                    <h2>
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display: inline-block; margin-right: 8px; vertical-align: middle;">
+                            <polyline points="4 7 4 4 20 4 20 7"></polyline>
+                            <line x1="9" y1="20" x2="15" y2="20"></line>
+                            <line x1="12" y1="4" x2="12" y2="20"></line>
+                        </svg>
+                        Pengaturan Font
+                    </h2>
+                    <button class="modal-close" id="closeFontSettingsModal">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="18" y1="6" x2="6" y2="18"></line>
+                            <line x1="6" y1="6" x2="18" y2="18"></line>
+                        </svg>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <!-- Arabic Font Family -->
+                    <div class="setting-group">
+                        <label class="setting-label">
+                            <span>Jenis Font Arab</span>
+                        </label>
+                        <select id="arabicFontFamily" class="font-select">
+                            <option value="'Amiri', serif">Amiri (Traditional)</option>
+                            <option value="'Scheherazade New', serif">Scheherazade (Classic)</option>
+                            <option value="'Noto Naskh Arabic', serif">Noto Naskh Arabic</option>
+                            <option value="'Cairo', sans-serif">Cairo (Modern)</option>
+                            <option value="'Lateef', serif">Lateef (Uthmanic)</option>
+                        </select>
+                    </div>
+
+                    <!-- Arabic Font Size -->
+                    <div class="setting-group">
+                        <label class="setting-label">
+                            <span>Ukuran Font Arab</span>
+                            <span class="font-size-value" id="arabicFontSizeValue">1.5rem</span>
+                        </label>
+                        <input type="range" id="arabicFontSize" class="font-slider" min="1" max="3" step="0.1" value="1.5">
+                        <div class="font-size-labels">
+                            <span>Kecil</span>
+                            <span>Sedang</span>
+                            <span>Besar</span>
+                        </div>
+                    </div>
+
+                    <!-- Translation Font Size -->
+                    <div class="setting-group">
+                        <label class="setting-label">
+                            <span>Ukuran Font Terjemahan</span>
+                            <span class="font-size-value" id="translationFontSizeValue">1rem</span>
+                        </label>
+                        <input type="range" id="translationFontSize" class="font-slider" min="0.8" max="1.5" step="0.05" value="1">
+                        <div class="font-size-labels">
+                            <span>Kecil</span>
+                            <span>Sedang</span>
+                            <span>Besar</span>
+                        </div>
+                    </div>
+
+                    <!-- Preview -->
+                    <div class="setting-group">
+                        <label class="setting-label">
+                            <span>Preview</span>
+                        </label>
+                        <div class="font-preview">
+                            <div class="preview-arabic" id="previewArabic">بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ</div>
+                            <div class="preview-translation">Dengan nama Allah Yang Maha Pengasih, Maha Penyayang</div>
+                        </div>
+                    </div>
+
+                    <!-- Reset Button -->
+                    <button class="reset-font-btn" id="resetFontBtn">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="1 4 1 10 7 10"></polyline>
+                            <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path>
+                        </svg>
+                        Reset ke Default
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Profile Dropdown from Dock -->""
+        <div class="dock-profile-dropdown hidden" id="dockProfileDropdown">
+            <div class="dock-dropdown-header">
+                <div class="dock-dropdown-avatar" id="dockDropdownAvatar">👤</div>
+                <div class="dock-dropdown-info">
+                    <div class="dock-dropdown-name" id="dockDropdownName">User</div>
+                    <div class="dock-dropdown-email" id="dockDropdownEmail">user@email.com</div>
+                </div>
+            </div>
+            <div class="dock-dropdown-actions">
+                <button class="dock-dropdown-item" id="dockOpenProfile">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                        <circle cx="12" cy="7" r="4"></circle>
+                    </svg>
+                    Profil Saya
+                </button>
+                <button class="dock-dropdown-item" id="dockOpenNotification">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                        <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+                    </svg>
+                    Notifikasi Sholat
+                </button>
+                <button class="dock-dropdown-item" id="dockOpenFontSettings">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M11 5H6a2 2 0 0 0-2 2v11a2 2 0 0 0 2 2h11a2 2 0 0 0 2-2v-5"></path>
+                        <path d="M18 2l4 4-10 10H8v-4L18 2z"></path>
+                    </svg>
+                    Pengaturan Font
+                </button>
+                <button class="dock-dropdown-item" id="dockLogoutBtn">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                        <polyline points="16 17 21 12 16 7"></polyline>
+                        <line x1="21" y1="12" x2="9" y2="12"></line>
+                    </svg>
+                    Keluar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

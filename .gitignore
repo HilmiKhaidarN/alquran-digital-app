@@ -1,0 +1,25 @@
+# Node modules
+node_modules/
+
+# Build outputs
+android/app/build/
+android/.gradle/
+android/build/
+android/local.properties
+
+# IDE
+.vscode/
+.idea/
+*.iml
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*
+
+# APK
+*.apk
+*.aab

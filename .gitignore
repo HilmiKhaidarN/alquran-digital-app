@@ -1,25 +1,53 @@
 # Node modules
 node_modules/
+jspm_packages/
 
 # Build outputs
 android/app/build/
 android/.gradle/
 android/build/
 android/local.properties
+build/Release
+.nuxt
+dist
+out
 
 # IDE
 .vscode/
 .idea/
 *.iml
+.vscode-test
 
 # OS
 .DS_Store
 Thumbs.db
 
 # Logs
+logs
 *.log
 npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
 
 # APK
 *.apk
 *.aab
+
+# Environment variables
+.env
+.env.*
+!.env.example
+
+# Cache
+.cache
+.parcel-cache
+.npm
+.eslintcache
+.stylelintcache
+*.tsbuildinfo
+
+# Optional files
+.node_repl_history
+*.tgz
+.yarn-integrity
